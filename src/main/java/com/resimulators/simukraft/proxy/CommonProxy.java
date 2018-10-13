@@ -15,12 +15,16 @@ import com.resimulators.simukraft.common.entity.entitysim.SpecialNameStorage;
 import com.resimulators.simukraft.common.entity.entitysim.SimEventHandler;
 import com.resimulators.simukraft.common.entity.entitysim.SpawnSimEntity;
 import com.resimulators.simukraft.common.entity.player.PlayerFirstJoin;
+import com.resimulators.simukraft.common.interfaces.CowCapability;
 import com.resimulators.simukraft.common.tileentity.Events.TileEntityCreate;
 import com.resimulators.simukraft.common.tileentity.TileFarm;
 import com.resimulators.simukraft.common.world.Rent_collection;
 import com.resimulators.simukraft.init.*;
 import com.resimulators.simukraft.network.PacketHandler;
+import com.sun.glass.ui.View;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 
@@ -29,7 +33,6 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
  */
 public class CommonProxy {
     public void preInit(FMLPreInitializationEvent event) {
-        ConfigHandler.load(event);
         NameStorage.init();
         SpecialNameStorage.init();
         ModFluids.init();
@@ -38,14 +41,12 @@ public class CommonProxy {
         ModTileEntities.init();
         ModEntities.init();
         PacketHandler.init();
+        CapabilityManager.INSTANCE.register(CowCapability.class,new CowCapability.Storage(),CowCapability.Impl::new);
     }
 
     public void init(FMLInitializationEvent event) {
         NetworkRegistry.INSTANCE.registerGuiHandler(SimUKraft.instance, new GuiHandler());
-
         ModOreDict.init();
-
-       // GameRegistry.registerTileEntity(TileFarm.class, Reference.MOD_ID + "TileFarm");
     }
 
     public void postInit(FMLPostInitializationEvent event) {
@@ -53,7 +54,7 @@ public class CommonProxy {
 
     public void onServerStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandStructure());
-        RenderSim.initSkinService();
+
     }
 
     public void onServerStarted(FMLServerStartedEvent event) {

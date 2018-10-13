@@ -5,12 +5,14 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
-public class TileController extends TileEntity {
+public class TileResidential extends TileEntity {
     private boolean occupied;
     private String type;
     private float rent;
     private int[] simMarker;
-    TileController(){}
+    public TileResidential(){}
+    public TileResidential(String name){}
+
 
 
     public void setOccupied(boolean occupied){
@@ -29,7 +31,7 @@ public class TileController extends TileEntity {
         return type;
     }
 
-    public void setRent(float rent) {
+    private void setRent(float rent) {
         this.rent = rent;
     }
 
@@ -37,7 +39,7 @@ public class TileController extends TileEntity {
         return rent;
     }
 
-    public void setSimMarker(int[] simMarker){
+    private void setSimMarker(int[] simMarker){
         this.simMarker = simMarker;
     }
 
@@ -50,22 +52,23 @@ public class TileController extends TileEntity {
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         setOccupied(nbt.getBoolean("occupied"));
-        setType(nbt.getString("type"));
+        if (nbt.hasKey("type")) setType(nbt.getString("type"));
         setRent(nbt.getFloat("rent"));
-        setSimMarker(nbt.getIntArray("simmarker"));
+        if (nbt.hasKey("simmarker"))setSimMarker(nbt.getIntArray("simmarker"));
     }
 
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt){
-        super.writeToNBT(nbt);
+
         nbt.setBoolean("occupied", occupied);
-        nbt.setString("type",type);
+        if (type != null) nbt.setString("type",type);
         nbt.setFloat("rent",rent);
-        nbt.setIntArray("simmarker",simMarker);
+        if (simMarker != null)nbt.setIntArray("simmarker",simMarker);
+        super.writeToNBT(nbt);
         return nbt;
     }
-
+/*
     @Override
     public NBTTagCompound getUpdateTag() {
         return writeToNBT(new NBTTagCompound());
@@ -81,5 +84,5 @@ public class TileController extends TileEntity {
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
         readFromNBT(packet.getNbtCompound());
 
-    }
+    }*/
 }

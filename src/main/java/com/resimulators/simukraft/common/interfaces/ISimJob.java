@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public interface ISimJob {
+public interface ISimJob extends ISim {
     void setHired(boolean hired);
 
     void setId(UUID id);

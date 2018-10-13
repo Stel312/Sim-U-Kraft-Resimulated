@@ -15,7 +15,6 @@ public class PacketHandler {
         INSTANCE.registerMessage(SimSpawnHandler.class,SimSpawnPacket.class,1,Side.CLIENT);
         INSTANCE.registerMessage(SimDeathHandler.class,SimDeathPacket.class,2,Side.CLIENT);
         INSTANCE.registerMessage(HiringHandler.class,HiringPacket.class,3,Side.SERVER);
-        INSTANCE.registerMessage(HiringHandler.class,HiringPacket.class,4,Side.CLIENT);
         INSTANCE.registerMessage(TriggerRefreshHandler.class,TriggerRefreshPacket.class,5,Side.SERVER);
         INSTANCE.registerMessage(RefreshHandler.class,RefreshPacket.class,6,Side.CLIENT);
         INSTANCE.registerMessage(PlayerUpdateHandler.class,PlayerUpdatePacket.class ,7,Side.CLIENT);
@@ -31,6 +30,11 @@ public class PacketHandler {
         INSTANCE.registerMessage(HungerHandler.class,HungerPacket.class,17,Side.CLIENT);
         INSTANCE.registerMessage(StartingGuiHandler.class,StartingGuiPacket.class,18,Side.SERVER);
         INSTANCE.registerMessage(ModeChangeHandler.class,ModeChangePacket.class,19,Side.SERVER);
+        INSTANCE.registerMessage(ItemRightClickedHandler.class,ItemRightClickedPacket.class,20,Side.SERVER);
+        INSTANCE.registerMessage(ItemClickedReturnHandler.class,ItemClickedReturnPacket.class,21,Side.CLIENT);
+        INSTANCE.registerMessage(ClientStructureHandler.class,ClientStructuresPacket.class,22,Side.CLIENT);
+        INSTANCE.registerMessage(ServerStructureHandler.class,ServerStructurePacket.class,23,Side.SERVER);
+        INSTANCE.registerMessage(LoadStructureHandler.class,LoadStructurePacket.class,24,Side.SERVER);
     }
 
 }

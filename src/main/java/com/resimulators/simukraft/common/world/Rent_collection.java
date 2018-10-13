@@ -11,20 +11,20 @@ public class Rent_collection {
     boolean rent_paid = true;
     float credits;
 
-    @SubscribeEvent
     protected void Collect_Rent(TickEvent.WorldTickEvent event) {
         World world = event.world;
         float rent = 4;
         if (!world.isRemote) {
             credits = SimEventHandler.getCredits();
             long time = world.getWorldTime() % 24000;
-            if (time == 0 && !rent_paid) {
+            if (time == 1 && !rent_paid) {
                 credits = credits + rent;
                 SimEventHandler.setCredits(credits);
                 PacketHandler.INSTANCE.sendToAll(new CreditsPacket());
                 rent_paid = true;
+                System.out.println("is this happening twice on the server");
             }
-            if (time != 0) {
+            if (time > 1) {
                 rent_paid = false;
             }
         }

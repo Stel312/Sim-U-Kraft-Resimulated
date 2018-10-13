@@ -23,39 +23,30 @@ public class SimEventHandler {
     private static float credits = 10;
 
     public static float getCredits() {
-        //System.out.println(" getting credits that is equal to: " + credits);
+
         return credits;
     }
 
     public static float setCredits(float credit) {
         credits = credit;
-        //System.out.println(" set credits to" + credits);
+
         return credits;
     }
 
-    public static void setWorldSimData(SaveSimData datas) {
-        data = datas;
-    }
 
-
-    public static SaveSimData getWorldSimData() {
-        return data;
-    }
 
     @SubscribeEvent
     public void Sim_Spawn(LivingSpawnEvent event) {
         World world = event.getWorld();
-        data = SaveSimData.get(world);
-
         if (event.getEntity() instanceof EntitySim) {
-
             if (!world.isRemote) {
-
-                if (!data.getTotalSims().contains(event.getEntity().getUniqueID())) {
-                    UUID id = event.getEntity().getUniqueID();
-                    data.spawnedSim(id);
-
-                    PacketHandler.INSTANCE.sendToAll(new SimSpawnPacket(id));
+                if (SaveSimData.get(world) != null) {
+                    if (!SaveSimData.get(world).getTotalSims(((EntitySim) event.getEntity()).getFactionId()).contains(event.getEntity().getUniqueID())) {
+                        SaveSimData.get(world).addtotalSim(event.getEntity().getUniqueID(), ((EntitySim) event.getEntity()).getFactionId());
+                        SaveSimData.get(world).addUnemployedsim(event.getEntity().getUniqueID(), ((EntitySim) event.getEntity()).getFactionId());
+                        System.out.println("sim spawn event called");
+                        SaveSimData.get(world).SendFactionPacket(new SimSpawnPacket(event.getEntity().getUniqueID()), ((EntitySim) event.getEntity()).getFactionId());
+                    }
                 }
             }
         }
@@ -69,9 +60,11 @@ public class SimEventHandler {
             if (!world.isRemote) {
                 UUID id = event.getEntity().getPersistentID();
                 int ids = event.getEntity().getEntityId();
-                data.simDied(id);
-                PacketHandler.INSTANCE.sendToAll(new SimDeathPacket(ids));
-                for (TileEntity entity : data.getJob_tiles()) {
+
+                SaveSimData.get(world).removeTotalSim(event.getEntity().getUniqueID(),((EntitySim) event.getEntity()).getFactionId());
+                SaveSimData.get(world).removeUnemployedSim(event.getEntity().getUniqueID(),((EntitySim) event.getEntity()).getFactionId());
+                SaveSimData.get(event.getEntity().world).SendFactionPacket(new SimDeathPacket(ids,((EntitySim) event.getEntity()).getFactionId()),((EntitySim) event.getEntity()).getFactionId());
+                for (TileEntity entity : SaveSimData.get(world).getJob_tiles()) {
                     ISimJob tile = (ISimJob) entity;
                     if (tile.getId() == id) {
 
@@ -79,7 +72,7 @@ public class SimEventHandler {
                         tile.setId(null);
                         tile.removeSim(ids);
 
-                        PacketHandler.INSTANCE.sendToAll(new HiredSimDeathPacket(entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(), ids));
+                        SaveSimData.get(event.getEntity().world).SendFactionPacket(new HiredSimDeathPacket(entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(), ids),((EntitySim) event.getEntity()).getFactionId());
                         return;
 
                     }

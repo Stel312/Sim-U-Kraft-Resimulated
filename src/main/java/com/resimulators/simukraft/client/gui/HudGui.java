@@ -21,21 +21,31 @@ public class HudGui extends Gui {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void Renderstats(RenderGameOverlayEvent.Post event) {
-        //System.out.println((SimEventHandler.getWorldSimData().isEnabled(Minecraft.getMinecraft().player.getUniqueID())));
-        if (SimEventHandler.getWorldSimData().isEnabled(Minecraft.getMinecraft().player.getUniqueID())){
-        credits = SimEventHandler.getCredits();
-        if (event.getType() == RenderGameOverlayEvent.ElementType.SUBTITLES){
-            Minecraft mc = Minecraft.getMinecraft();
-            if (SimEventHandler.getWorldSimData() != null) {
-                sim = SimEventHandler.getWorldSimData().getTotalSims();
-                if (sim == null) {
-                    population = 0;
-                } else {
-                    population = sim.size();
+        if (SaveSimData.get(Minecraft.getMinecraft().world) != null){
+                credits = SimEventHandler.getCredits();
+                if (event.getType() == RenderGameOverlayEvent.ElementType.TEXT){
+                    if (Minecraft.getMinecraft().gameSettings.showDebugInfo)return;
+                    if (SaveSimData.get(Minecraft.getMinecraft().world).isMode(Minecraft.getMinecraft().player.getUniqueID()) != null){
+                    if (SaveSimData.get(Minecraft.getMinecraft().world).isMode(Minecraft.getMinecraft().player.getUniqueID()) != -1){
+                    Minecraft mc = Minecraft.getMinecraft();
+                    sim = SaveSimData.get(Minecraft.getMinecraft().world).getTotalSims(SaveSimData.get(Minecraft.getMinecraft().world).getPlayerFaction(Minecraft.getMinecraft().player.getUniqueID()));
+                    if (sim == null) {
+                        population = 0;
+                    } else {
+                        population = sim.size();
+                    }
+                    int unemployedsize;
+                    if (SaveSimData.get(Minecraft.getMinecraft().world).getUnemployedSims(SaveSimData.get(Minecraft.getMinecraft().world).getPlayerFaction(Minecraft.getMinecraft().player.getUniqueID())) != null){
+                    unemployedsize = SaveSimData.get(Minecraft.getMinecraft().world).getUnemployedSims(SaveSimData.get(Minecraft.getMinecraft().world).getPlayerFaction(Minecraft.getMinecraft().player.getUniqueID())).size();}
+                    else{
+                        unemployedsize = 0; }
+                    drawString(mc.fontRenderer, "Population " + population + ", Unemployed sims: " + unemployedsize, 1, 1, Color.WHITE.getRGB());
+                    if (SaveSimData.get(Minecraft.getMinecraft().world).isMode(Minecraft.getMinecraft().player.getUniqueID()) == 0){
+                    drawString(mc.fontRenderer, "Credits: " + credits, 1, 11, Color.WHITE.getRGB());
+                        }
+                    }
                 }
-                drawString(mc.fontRenderer, "Population " + population + ", Unemployed sims: " + SimEventHandler.getWorldSimData().getUnemployed_sims().size(), 1, 1, Color.WHITE.getRGB());
-                drawString(mc.fontRenderer, "Credits: " + credits, 1, 11, Color.WHITE.getRGB());
             }
         }
-    }
-}}
+    }}
+

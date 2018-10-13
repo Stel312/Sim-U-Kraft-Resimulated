@@ -1,6 +1,7 @@
 package com.resimulators.simukraft.client.gui;
 
 import com.resimulators.simukraft.common.entity.entitysim.EntitySim;
+import com.resimulators.simukraft.common.interfaces.ISim;
 import com.resimulators.simukraft.common.interfaces.ISimJob;
 import com.resimulators.simukraft.network.HiringPacket;
 import com.resimulators.simukraft.network.PacketHandler;
@@ -13,10 +14,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
 import java.awt.*;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 public class GuiHire extends GuiScreen {
     private String name;
@@ -35,7 +34,7 @@ public class GuiHire extends GuiScreen {
 
     public GuiHire(TileEntity tileEntity){
         this.tileEntity = tileEntity;
-        this.profession = ((ISimJob)tileEntity).getProfession();
+        this.profession = ((ISim)tileEntity).getProfession();
     }
 
     public void add_sim(int id) {
@@ -44,19 +43,21 @@ public class GuiHire extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        drawDefaultBackground();
-        if (!status.equals("hiring")) {
-            drawString(mc.fontRenderer, profession, (width / 2) - fontRenderer.getStringWidth(profession) / 2, height / 4 - 10, Color.WHITE.getRGB());
+        if (mc != null) {
+            drawDefaultBackground();
+            if (!status.equals("hiring")) {
+                drawString(mc.fontRenderer, profession, (width / 2) - fontRenderer.getStringWidth(profession) / 2, height / 4 - 10, Color.WHITE.getRGB());
+            }
+            this.mouseX = mouseX;
+            this.mouseY = mouseY;
+            super.drawScreen(mouseX, mouseY, partialTicks);
         }
-        this.mouseX = mouseX;
-        this.mouseY = mouseY;
-        super.drawScreen(mouseX, mouseY, partialTicks);
-
     }
 
     @Override
     public void updateScreen() {
-        for (GuiButton button : buttonList) {
+        List<GuiButton> buttons = buttonList;
+        for (GuiButton button : buttons) {
             if (button instanceof SimButton) {
                 if (!status.equals("hiring")) {
                     button.visible = false;
@@ -92,8 +93,8 @@ public class GuiHire extends GuiScreen {
         sims.clear();
         world = Minecraft.getMinecraft().world;
         int num = 0;
-        List<String> names = ((ISimJob)tileEntity).getnames();
-        for (int id: ((ISimJob)tileEntity).getSims())
+        List<String> names = ((ISim)tileEntity).getnames();
+        for (int id: ((ISim)tileEntity).getSims())
         {
             int xpos = pos*100+20+pos*5;
 
@@ -136,8 +137,8 @@ public class GuiHire extends GuiScreen {
         }
         if (button instanceof SimButton) {
             ((SimButton) button).clicked = true;
-            ((ISimJob)tileEntity).setHired(true);
-            PacketHandler.INSTANCE.sendToServer(new HiringPacket(((SimButton) button).simid,((ISimJob)tileEntity).getProfessionint()));
+            ((ISim)tileEntity).setHired(true);
+            PacketHandler.INSTANCE.sendToServer(new HiringPacket(((SimButton) button).simid,((ISim)tileEntity).getProfessionint(),tileEntity.getPos().getX(),tileEntity.getPos().getY(),tileEntity.getPos().getZ()));
             PacketHandler.INSTANCE.sendToServer(new UpdateJobIdPacket(((SimButton) button).simid, tileEntity.getPos().getX(), tileEntity.getPos().getY(), tileEntity.getPos().getZ()));
             mc.displayGuiScreen(null);
         }
